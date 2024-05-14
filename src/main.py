@@ -1,3 +1,5 @@
+from typing import List
+
 import strawberry
 from fastapi import FastAPI
 from strawberry.asgi import GraphQL
@@ -9,14 +11,24 @@ class Todo:
     # priority: str
     # user_id: str
 
+todos: List[Todo] = []
+
 @strawberry.type
 class Query:
 
     @strawberry.field
-    def todo(self) -> Todo:
-        return Todo(title='first todo')
+    def todo(self) -> List[Todo]:
+        return todos
 
-schema = strawberry.Schema(query=Query)
+@strawberry.type
+class Mutation:
+    @strawberry.mutation
+    def create_todo(self, title: str) -> Todo:
+        new_todo = Todo(title=title)
+        todos.append(new_todo)
+        return new_todo
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)
 
 graphql_app = GraphQL(schema)
 
