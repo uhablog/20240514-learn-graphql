@@ -5,8 +5,14 @@ from fastapi import FastAPI
 from strawberry.asgi import GraphQL
 
 @strawberry.type
+class SubTodo:
+    subtitle: str
+
+@strawberry.type
 class Todo:
+    id: int
     title: str
+    subTodo: List[SubTodo]
     # limit: Datetime
     # priority: str
     # user_id: str
@@ -22,11 +28,16 @@ class Query:
 
 @strawberry.type
 class Mutation:
+
     @strawberry.mutation
     def create_todo(self, title: str) -> Todo:
-        new_todo = Todo(title=title)
+        new_todo = Todo(id=len(todos)+1, title=title, subTodo=[])
         todos.append(new_todo)
         return new_todo
+
+    @strawberry.mutation
+    def create_sub_todo(self, subtitle: str) -> SubTodo:
+        new_sub_todo = SubTodo(subtitle=subtitle)
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)
 
